@@ -222,4 +222,5 @@ def get_selection(text):
 
 def get_line_col(index):
     line, col = map(int, index.split(".")) # Fails on invalid index
+    print line, col
     return line, col

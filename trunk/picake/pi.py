@@ -48,12 +48,12 @@ class pi:
 			term = n/d
 			sum += term
 			if sum == last_sum:
-				fp = open('pi.txt', 'w')
+				fp = open('pi', 'w')
 				fp.write(str(1 / (12 * sum)))
 				fp.close()
 				self.iterations = i
 				return self
 			last_sum = sum
 			k += 1
-			if i > 2000:
+			if i > 10000:
 				raise NotConvergentError
