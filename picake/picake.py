@@ -8,6 +8,7 @@ from Tkinter import *
 import Tix
 from pi import pi
 import SearchDialog
+from Formatter import TextFormatter
 
 APP_NAME = "PI Cake - PI computation project"
 APP_SIZE = '790x550+134+121'
@@ -98,6 +99,7 @@ class piGUI:
         self.resultLbl.pack(fill=Tix.X, padx=3, pady=3)
         
         self.butBox = Tix.ButtonBox(self.p2, orientation=Tix.HORIZONTAL)
+        self.butBox.add('format', text='Format', width=14, command=self.format_text)
         self.butBox.add('run', text="Run", width=14, command=self.run)
         self.butBox.pack(side=Tix.BOTTOM, fill=Tix.X)
         #Tab for calcualtor
@@ -125,21 +127,37 @@ class piGUI:
         except TypeError:
             alert('Percision should be an Integer')
         pii = pi(n)
-        r = pii.compute_chudnovsky()
-        self.refresh_text()
-            
+        try:
+            r = pii.compute_chudnovsky()
+        finally:
+            self.refresh_text()
+        
     def refresh_text(self):
         try:
             #self.lb.text['state'] = 'enabled'
-            fp = open('pi.txt', 'r')
+            self.lb_text.delete(1.0, END)
+            fp = open('pi', 'r')
             data = fp.read()
+            #p = TextFormatter(data[2:]).format()
             #print data
             self.lb_text.insert(1.0, data)
             #self.lb.text['state'] = 'disabled'
             fp.close()
+            #alert(len(data)-2)
         except Exception, e:
             str(e)
             pass
+        
+        
+    def format_text(self):
+        self.lb_text.delete(1.0, END)
+        fp = open('pi', 'r')
+        data = fp.readlines()
+        fp.close()
+	#print data
+        p = TextFormatter(data[0]).format()
+	#print p
+        self.lb_text.insert(1.0, ''.join(p))
         
     def find_event(self, event=None):
         SearchDialog.find(self.lb_text)
