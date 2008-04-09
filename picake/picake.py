@@ -6,6 +6,7 @@ MiNI 2008 Politehcnika Warsaw
 
 from Tkinter import *
 import Tix
+import signal
 from pi import pi
 import SearchDialog
 from Formatter import TextFormatter
@@ -20,7 +21,13 @@ APP_YEAR = "2008"
 APP_DEPT = "MiNI, Politechnika Warsaw"
 APP_AUTHOR_HOME = "http://gamma.mini.pw.edu.pl/~thukrald/"
 
-MAX_VALUE = 3000
+class sigHandler:
+	""" Adds posibility to stop program while computation """
+	def __init__(self):
+		self.signaled = 0
+	def __call__(self):
+		self.signaled += 1
+
 
 def vp_start_gui():
     global w
