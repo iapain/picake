@@ -35,7 +35,8 @@ class pi:
 		self.convergence = -1
 
 	def compute_chudnovsky(self):
-		gmpy.set_minprec(self.percision)
+		ts = time.time()
+		gmpy.set_minprec(self.percision*3 + int(self.percision/10) + int(4*self.percision/100) + int(5*self.percision/10))
 		sum = gmpy.mpf(0)
 		k = gmpy.mpf(0)
 		i = 0
@@ -52,6 +53,8 @@ class pi:
 				fp.write(str(1 / (12 * sum)))
 				fp.close()
 				self.iterations = i
+				self.time_took = time.time() - ts
+				print self.time_took
 				return self
 			last_sum = sum
 			k += 1
