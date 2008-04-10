@@ -10,6 +10,7 @@ import signal
 from pi import pi
 import SearchDialog
 from Formatter import TextFormatter
+from calculator import SimpleCalculator
 
 APP_NAME = "PI Cake - PI computation project"
 APP_SIZE = '790x550+134+121'
@@ -111,11 +112,12 @@ class piGUI:
         self.butBox.pack(side=Tix.BOTTOM, fill=Tix.X)
         #Tab for calcualtor
         tab = self.nb.calculator
-        self.f = Tix.Frame(tab)
+        self.fc = Tix.Frame(tab)
         self.common = Tix.Frame(tab)
         
-        self.f.pack(side=Tix.LEFT, padx=0, pady=0, fill=Tix.BOTH, expand=1)
+        self.fc.pack(side=Tix.LEFT, padx=0, pady=0, fill=Tix.BOTH, expand=1)
         self.common.pack(side=Tix.RIGHT, padx=0, fill=Tix.Y)
+        self.calc = SimpleCalculator(self.fc).draw()
         
         #Tab for about
         tab=self.nb.about
@@ -127,7 +129,7 @@ class piGUI:
         Label(self.f, text="Author: %s\n%s" %(APP_AUTHOR, APP_AUTHOR_HOME), font=('courier',12,'bold')).pack(fill=Tix.X, padx=3, pady=3)
         Label(self.f, text="Under guidance of %s\n%s" %(APP_MENTOR, APP_MENTOR_HOME), font=('courier',12,'bold')).pack(fill=Tix.X, padx=3, pady=3)
         Label(self.f, text="%s\n%s\n%s" %(APP_DESC, APP_DEPT, APP_YEAR)).pack(fill=Tix.X, padx=3, pady=3)
-        
+            
     def run(self):
         try:
             n = int(self.ma.get())
@@ -172,7 +174,9 @@ class piGUI:
 
 def alert(val):
     import Dialog
-    Dialog.Dialog(title=APP_NAME, text=val, bitmap="",default=0,strings=("OK",))    
+    Dialog.Dialog(title=APP_NAME, text=val, bitmap="",default=0,strings=("OK",))
+    
+
     
 def close(self=None):
     root.destroy()

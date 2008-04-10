@@ -1,7 +1,9 @@
-#! /usr/bin/env python
-# -*- python -*-
-# Version 0.2.50
-# Time-stamp: <2005-09-25 11:10:52 Deepak Thukral>
+"""
+Search Engine core
+PI cake PI computation project
+Author: Deepak Thukral
+MiNI 2008 Politehcnika Warsaw
+"""
 
 import re
 from Tkinter import *
