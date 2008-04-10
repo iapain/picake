@@ -85,7 +85,7 @@ class piGUI:
         
         self.pane = Tix.PanedWindow(self.f, orientation='vertical')
 
-        self.p1 = self.pane.add('a', min=70, size=300)
+        self.p1 = self.pane.add('a', min=70, size=400)
         self.p2 = self.pane.add('b', min=70)
 
         self.pane.pack(fill=BOTH, expand=1)
@@ -133,8 +133,9 @@ class piGUI:
     def run(self):
         try:
             n = int(self.ma.get())
-        except TypeError:
+        except (TypeError, ValueError):
             alert('Percision should be an Integer')
+            return
         pii = pi(n)
         try:
             r = pii.compute_chudnovsky()
