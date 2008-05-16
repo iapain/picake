@@ -3,7 +3,7 @@ PI cake PI computation project
 Author: Deepak Thukral
 MiNI 2008 Politehcnika Warsaw
 """
-
+import re
 from Tkinter import *
 import Tix
 import signal
@@ -163,6 +163,7 @@ class piGUI:
 
         self.scrollbar = Scrollbar(self.p4, orient=VERTICAL)
         self.listbox = Listbox(self.p4, font=('courier',14,'bold'), yscrollcommand=self.scrollbar.set)
+        self.listbox.bind("<Double-Button-1>", self.get_sel)
         self.scrollbar.config(command=self.listbox.yview)
         self.scrollbar.pack(side=RIGHT, fill=Y)
         self.listbox.pack(side=LEFT, fill=BOTH, expand=1)
@@ -191,28 +192,45 @@ class piGUI:
         try:
             r = pii.compute_chudnovsky()
         finally:
-            self.refresh_text(self.lb)
+            self.refresh_text(self.lb_text)
             
     def run_search(self):
-        import re
+        global ql
         i = 0
         fp = open('pi', 'r')
         T = fp.read()
         fp.close()
-        starts =  [match.start() for match in re.finditer(re.escape(self.ma2.get()), T)]
+        q = self.ma2.get()
+        ql = len(q)
+        starts =  [match.start() for match in re.finditer(re.escape(q), T)]
         self.resultLbl['text'] = str(len(starts)) + " Matches Found."
+        self.listbox.delete(0, END)
         for start in starts:
             i+=1
-            self.listbox.insert(END, "%d   ...%s... : %d" % (i, self.near(T, start), start)) 
-        print starts
+            self.listbox.insert(END, "%d   ...%s... : %d" % (i, self.near(T, len(q), start), start)) 
 
-    def near(self, T, start=0):
-        if start-5 < 0 and start+5 < len(T):
-            return T[start:start+5]
-        elif start-5 >=0 and start+5 < len(T):
-            return T[start-5:start+5]
+    def near(self, T, q, start=0):
+        if start - 5 < 0 and start + q + 5 < len(T):
+            return T[start:start+q+5]
+        elif start - 5 >=0 and start + q + 5 < len(T):
+            return T[start-5:start+q+5]
+        elif start - 5 >=0 and start + q + 5 >= len(T):
+            return T[start-5:start+q+5]
         else:
-            return ""
+            return "?????"
+
+    def get_sel(self, event):
+        a = int(self.listbox.get(self.listbox.curselection()[0]).split(':')[1].strip())
+        
+        first = "%d.%d" % (1, a)
+        last = "%d.%d" % (1, a+ql)
+        self.lbs_text.tag_remove("sel", "1.0", "end")
+        self.lbs_text.tag_add("sel", first, last)
+        self.lbs_text.mark_set(INSERT, first)
+        self.lbs_text.see(INSERT)
+        self.lbs_text.focus()
+
+
             
         
     def refresh_text(self, a):
