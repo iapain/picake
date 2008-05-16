@@ -72,6 +72,7 @@ class piGUI:
         self.nb.nbframe['backpagecolor'] = 'gray'
         self.nb.add('pi', label='PI Computation', underline=0)
         self.nb.add('calculator', label='Calculator', underline=0)
+        self.nb.add('search', label='Search', underline=0)
         self.nb.add('about', label='About', underline=0)
         self.nb.pack(expand=1, fill=Tix.BOTH, padx=1, pady=1 ,side=Tix.TOP)
         
@@ -85,7 +86,7 @@ class piGUI:
         
         self.pane = Tix.PanedWindow(self.f, orientation='vertical')
 
-        self.p1 = self.pane.add('a', min=70, size=400)
+        self.p1 = self.pane.add('a', min=70, size=300)
         self.p2 = self.pane.add('b', min=70)
 
         self.pane.pack(fill=BOTH, expand=1)
@@ -97,7 +98,7 @@ class piGUI:
         self.lb_text.bind('<Control-f>', self.find_event)
         self.lb_text.bind('<Control-F>', self.find_event)
         
-        self.refresh_text()
+        self.refresh_text(self.lb_text)
         
         
         Label(self.p2, text="Precision: ").pack(fill=Tix.Y, padx=3, pady=3, side=Tix.LEFT)
@@ -110,6 +111,7 @@ class piGUI:
         self.butBox.add('format', text='Format', width=14, command=self.format_text)
         self.butBox.add('run', text="Run", width=14, command=self.run)
         self.butBox.pack(side=Tix.BOTTOM, fill=Tix.X)
+        
         #Tab for calcualtor
         tab = self.nb.calculator
         self.fc = Tix.Frame(tab)
@@ -118,6 +120,55 @@ class piGUI:
         self.fc.pack(side=Tix.LEFT, padx=0, pady=0, fill=Tix.BOTH, expand=1)
         self.common.pack(side=Tix.RIGHT, padx=0, fill=Tix.Y)
         self.calc = SimpleCalculator(self.fc).draw()
+
+        #Tab for Search
+        tab = self.nb.search
+        self.fs = Tix.Frame(tab)
+        self.common = Tix.Frame(tab)
+        
+        self.fs.pack(side=Tix.LEFT, padx=0, pady=0, fill=Tix.BOTH, expand=1)
+        self.common.pack(side=Tix.RIGHT, padx=0, fill=Tix.Y)
+
+        self.spane = Tix.PanedWindow(self.fs, orientation='horizontal')
+
+        self.p1 = self.spane.add('a', min=70, size=300)
+        self.p2 = self.spane.add('b', min=70)
+
+        self.spane.pack(fill=BOTH, expand=1)
+        self.lbs = Tix.ScrolledText(self.p1, scrollbar='auto')
+        self.lbs_text = self.lbs.subwidget_list["text"]
+        self.lbs.text['wrap'] = None
+        self.lbs.pack(fill=BOTH, expand=1)
+        
+        self.lbs_text.bind('<Control-f>', self.find_event)
+        self.lbs_text.bind('<Control-F>', self.find_event)
+        
+        self.refresh_text(self.lbs_text)
+        
+        self.spane2 = Tix.PanedWindow(self.p2, orientation='vertical')
+
+        self.p3 = self.spane2.add('a', min=70, size=100)
+        self.p4 = self.spane2.add('b', min=70)
+        self.spane2.pack(fill=BOTH, expand=1)
+
+        Label(self.p3, text="Search for: ").pack(fill=Tix.Y, padx=3, pady=3, side=Tix.LEFT)
+        self.ma2 = Entry(self.p3)
+        self.ma2.pack(fill=Tix.X, padx=3, pady=3, side=Tix.LEFT)
+        self.resultLbl = Label(self.p2, text='', font=('courier',24,'bold'))
+        self.resultLbl.pack(fill=Tix.X, padx=3, pady=3)
+        
+        self.butBox = Tix.ButtonBox(self.p3, orientation=Tix.HORIZONTAL)
+        self.butBox.add('run', text="Search", width=14, command=self.run_search)
+        self.butBox.pack(side=Tix.BOTTOM, fill=Tix.X)
+
+        self.scrollbar = Scrollbar(self.p4, orient=VERTICAL)
+        self.listbox = Listbox(self.p4, font=('courier',14,'bold'), yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.listbox.yview)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+        self.listbox.pack(side=LEFT, fill=BOTH, expand=1)
+        
+        
+        
         
         #Tab for about
         tab=self.nb.about
@@ -140,17 +191,39 @@ class piGUI:
         try:
             r = pii.compute_chudnovsky()
         finally:
-            self.refresh_text()
+            self.refresh_text(self.lb)
+            
+    def run_search(self):
+        import re
+        i = 0
+        fp = open('pi', 'r')
+        T = fp.read()
+        fp.close()
+        starts =  [match.start() for match in re.finditer(re.escape(self.ma2.get()), T)]
+        self.resultLbl['text'] = str(len(starts)) + " Matches Found."
+        for start in starts:
+            i+=1
+            self.listbox.insert(END, "%d   ...%s... : %d" % (i, self.near(T, start), start)) 
+        print starts
+
+    def near(self, T, start=0):
+        if start-5 < 0 and start+5 < len(T):
+            return T[start:start+5]
+        elif start-5 >=0 and start+5 < len(T):
+            return T[start-5:start+5]
+        else:
+            return ""
+            
         
-    def refresh_text(self):
+    def refresh_text(self, a):
         try:
             #self.lb.text['state'] = 'enabled'
-            self.lb_text.delete(1.0, END)
+            a.delete(1.0, END)
             fp = open('pi', 'r')
             data = fp.read()
             #p = TextFormatter(data[2:]).format()
             #print data
-            self.lb_text.insert(1.0, data)
+            a.insert(1.0, data)
             #self.lb.text['state'] = 'disabled'
             fp.close()
             #alert(len(data)-2)
