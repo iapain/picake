@@ -9,7 +9,7 @@ import sys
 
 class TextFormatter:
     ''' Formats file in readable order '''
-    def __init__(self, text, blocks_per_line=5, digits_per_block=10, rows_per_block=20, row_tabs=2, col_tabs=1, show_count=True):
+    def __init__(self, text, blocks_per_line=10, digits_per_block=6, rows_per_block=20, row_tabs=2, col_tabs=1, show_count=True):
         self.text = text[2:]
         self.blocks_per_line = blocks_per_line
         self.digits_per_block = digits_per_block
@@ -28,6 +28,8 @@ class TextFormatter:
         for i in self.text:
             buff += i
             cnt += 1
+            if cnt*2 == self.digits_per_block:
+                buff+=' '
             if cnt == self.digits_per_block:
                 if b < self.blocks_per_line - 1:
                     for j in range(self.col_tabs):
@@ -36,7 +38,7 @@ class TextFormatter:
                     cnt = 0
                 else:
                     if self.show_count:
-                        prev += len(buff) - (self.blocks_per_line - 1)*self.col_tabs
+                        prev += len(buff) - (self.blocks_per_line - 1)*2*self.col_tabs - 1
                         self.format_text.append(buff + ' : ' + str(prev))
                     else:
                         self.format_text.append(buff)

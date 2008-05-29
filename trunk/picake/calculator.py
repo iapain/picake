@@ -34,10 +34,14 @@ class SimpleCalculator:
             if c > 4:
                 c = 0
                 r += 1
+                
+        self.v = StringVar()
+        self.v2 = StringVar()
+        self.v3 = StringVar()
         self.scrollbar = Scrollbar(self.panel, orient=HORIZONTAL)
-        self.entry = Entry(self.panel, width=50, font=('courier',16,'bold'), justify=RIGHT,)
-        self.entry2 = Entry(self.panel, width=50, font=('courier',16,'bold'), justify=RIGHT)
-        self.answer = Entry(self.panel, font=('courier',16,'bold'), bg="yellow", justify=RIGHT, width=50)
+        self.entry = Entry(self.panel, width=50, font=('courier',16,'bold'), justify=RIGHT, textvariable=self.v)
+        self.entry2 = Entry(self.panel, width=50, font=('courier',16,'bold'), justify=RIGHT, textvariable=self.v2)
+        self.answer = Entry(self.panel, font=('courier',16,'bold'), bg="yellow", justify=RIGHT, width=50, textvariable=self.v3)
 
         self.entry.bind('<FocusIn>', setattr(self, 'which', 0))
         self.entry2.bind('<FocusIn>', setattr(self, 'which', 1))
@@ -57,7 +61,16 @@ class SimpleCalculator:
 
     def scrollhandler(self, *args):
         op, howMany = args[0], args[1]
-        print args
+        op1 = self.entry.get()
+        op2 = self.entry2.get()
+        ans = self.answer.get()
+        
+        max_len = max(len(op1), len(op2), len(ans))
+        
+        self.v.set(self.gen_space(max_len - len(op1)) + op1)
+        self.v2.set(self.gen_space(max_len - len(op2)) + op2)
+        self.v3.set(self.gen_space(max_len - len(ans)) + ans)
+        
         if op == "scroll":
             units = args[2]
             self.entry.xview_scroll ( howMany, units )
@@ -68,7 +81,11 @@ class SimpleCalculator:
             self.entry2.xview_moveto( howMany )
             self.answer.xview_moveto ( howMany)
         
-
+    def gen_space(self, n):
+        buf = ""
+        for i in xrange(n):
+            buf += " "
+        return buf
         
     def click(self, key):
         if not self.which:
