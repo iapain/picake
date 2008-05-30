@@ -34,7 +34,22 @@ class pi:
 		self.time_took = -1
 		self.convergence = -1
 
+	def gmp_arch_tan(self):
+		self.method = "ArcTan"
+		print self.method
+		ts = time.time()
+		dat =  str(gmpy.pi(self.percision*3 + int(self.percision/10) + int(4*self.percision/100) + int(5*self.percision/10)))[:self.percision]
+		self.time_took = time.time() - ts
+		try:
+			fp = open('pi', 'w')
+		except IOError:
+			print "Computation uses file IO. Couldn't create file for dumping values."
+		fp.write(dat)
+		fp.close()
+		return;
+		
 	def compute_chudnovsky(self):
+		self.method = "Chudnovsky"
 		ts = time.time()
 		gmpy.set_minprec(self.percision*3 + int(self.percision/10) + int(4*self.percision/100) + int(5*self.percision/10))
 		sum = gmpy.mpf(0)
@@ -54,7 +69,6 @@ class pi:
 				fp.close()
 				self.iterations = i
 				self.time_took = time.time() - ts
-				print self.time_took
 				return self
 			last_sum = sum
 			k += 1

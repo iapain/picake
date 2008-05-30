@@ -7,6 +7,9 @@ MiNI 2008 Politehcnika Warsaw
 from Tkinter import *
 import gmpy
 import Tix
+import os
+from tkFileDialog import askopenfilename, asksaveasfilename
+from tkMessageBox import showerror
 
 
 class SimpleCalculator:
@@ -14,6 +17,7 @@ class SimpleCalculator:
     def __init__(self, panel):
         self.panel = panel
         self.which = 0
+        self.dir = os.path.dirname(__file__)
         gmpy.set_minprec(2000)
         
     def draw(self):
@@ -42,22 +46,84 @@ class SimpleCalculator:
         self.entry = Entry(self.panel, width=50, font=('courier',16,'bold'), justify=RIGHT, textvariable=self.v)
         self.entry2 = Entry(self.panel, width=50, font=('courier',16,'bold'), justify=RIGHT, textvariable=self.v2)
         self.answer = Entry(self.panel, font=('courier',16,'bold'), bg="yellow", justify=RIGHT, width=50, textvariable=self.v3)
+        self.load1 = Button(self.panel, text=">>", command=self.load_file1)
+        self.load2 = Button(self.panel, text=">>", command=self.load_file2)
+        self.save1 = Button(self.panel, text="Save", command=self.load_save1)
+        self.save2 = Button(self.panel, text="Save", command=self.load_save2)
 
-        self.entry.bind('<FocusIn>', setattr(self, 'which', 0))
-        self.entry2.bind('<FocusIn>', setattr(self, 'which', 1))
+        self.entry.bind('<FocusIn>', self.set_entry1)
+        self.entry2.bind('<FocusIn>', self.set_entry2)
+        self.answer.bind('<FocusIn>', self.set_entry3)
+        
         self.label = Label(self.panel, text="=", font=('courier',16,'bold'))
 
         
         self.scrollbar.config(command=self.scrollhandler)
         
         self.entry.grid(row=0, column=0, columnspan=5)
+        self.load1.grid(row=0, column=6)
+        self.save1.grid(row=0, column=7)
         self.entry2.grid(row=1, column=0, columnspan=5)
+        self.load2.grid(row=1, column=6)
+        self.save2.grid(row=1, column=7)
         self.scrollbar.grid(sticky=E+W, row=2, column=0, columnspan=5)
         self.answer.grid(row=3, column=0, columnspan=5)
 
         self.entry['xscrollcommand']=self.scrollbar.set
 
         self.entry.focus_set()
+        
+    def load_file1(self):
+        self.load_file(1)
+        
+    def load_file2(self):
+        self.load_file(2)
+        
+    def load_save1(self):
+        self.save_file(1)
+        
+    def load_save2(self):
+        self.save_file(2)
+        
+    def save_file(self, n=1):
+        f = asksaveasfilename(initialdir=self.dir)
+        self.dir = os.path.dirname(f)
+        dat = ""
+        if n == 1:
+           dat = self.v.get()
+        elif n == 2:
+            dat = self.v2.get()
+        else:
+            dat = self.v3.get()
+        try:
+            fp = open(f, 'w')
+            fp.write(dat)
+            fp.close()
+        except IOError:
+            showerror("Couldn't Write file: IOError")
+            
+        
+    def load_file(self, n=1):
+        f = askopenfilename(initialdir=self.dir)
+        self.dir = os.path.dirname(f)
+        fp = open(f, 'r')
+        data = fp.read()
+        fp.close()
+        if n == 1:
+            self.v.set(data)
+        elif n == 2:
+            self.v2.set(data)
+        else:
+            self.v3.set(data)
+        
+    def set_entry1(self, event=None):
+        self.which = 0
+        
+    def set_entry2(self, event=None):
+        self.which = 1
+        
+    def set_entry3(self, event=None):
+        self.which = 2
 
     def scrollhandler(self, *args):
         op, howMany = args[0], args[1]
@@ -88,16 +154,17 @@ class SimpleCalculator:
         return buf
         
     def click(self, key):
+        gmpy.set_minprec(1000)
         if not self.which:
             try:
                 a = int(key)
                 self.entry.insert(END, key)
             except:
                 pass
-        if self.which:
+        else:
             try:
                 a = int(key)
-                self.entry.insert(END, key)
+                self.entry2.insert(END, key)
             except:
                 pass
 
@@ -151,7 +218,41 @@ class SimpleCalculator:
             self.answer.delete(0, END)
             try:
                 self.answer.insert(0, str(gmpy.mpf(self.entry.get())**gmpy.mpf(self.entry2.get())))
-            except:
+            except Exception, e:
+                print str(e)
                 self.answer.insert(0, 'Error')
+                
+        
+        if key == 'neg':
+            if self.which == 0:
+                try:
+                    op = int(self.entry.get())
+                    if not self.entry.get().startswith('-'):
+                        self.v.set('-' + self.entry.get())
+                    else:
+                        self.v.set(self.entry.get()[1:])
+                except ValueError:
+                    pass
+                
+            elif self.which == 1:
+                try:
+                    op = int(self.entry2.get())
+                    if not self.entry2.get().startswith('-'):
+                        self.v2.set('-' + self.entry2.get())
+                    else:
+                        self.v2.set(self.entry2.get()[1:])
+                except ValueError:
+                    pass
             
+            else:
+                try:
+                    op = int(self.answer.get())
+                    if not self.answer.get().startswith('-'):
+                        self.v3.set('-' + self.answer.get())
+                    else:
+                        self.v3.set(self.answer.get()[1:])
+                except ValueError:
+                    pass
+                
+                
             
