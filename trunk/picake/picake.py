@@ -190,9 +190,13 @@ class piGUI:
             return
         pii = pi(n)
         try:
-            r = pii.compute_chudnovsky()
+            if n > 10000:
+                r = pii.gmp_arch_tan()
+            else:
+                r = pii.compute_chudnovsky()
         finally:
             self.refresh_text(self.lb_text)
+            self.refresh_text(self.lbs_text) 
             
     def run_search(self):
         global ql
