@@ -11,6 +11,7 @@ from pi import pi
 import SearchDialog
 from Formatter import TextFormatter
 from calculator import SimpleCalculator
+from graph import SimpleGraph
 
 APP_NAME = "PI Cake - PI computation project"
 APP_SIZE = '790x550+134+121'
@@ -73,6 +74,7 @@ class piGUI:
         self.nb.add('pi', label='PI Computation', underline=0)
         self.nb.add('calculator', label='Calculator', underline=0)
         self.nb.add('search', label='Search', underline=0)
+        self.nb.add('graph', label='Graph', underline=0)
         self.nb.add('about', label='About', underline=0)
         self.nb.pack(expand=1, fill=Tix.BOTH, padx=1, pady=1 ,side=Tix.TOP)
         
@@ -168,7 +170,14 @@ class piGUI:
         self.scrollbar.pack(side=RIGHT, fill=Y)
         self.listbox.pack(side=LEFT, fill=BOTH, expand=1)
         
+        #Tab for graph
+        tab=self.nb.graph
+        self.fg = Tix.Frame(tab)
+        self.common = Tix.Frame(tab)
         
+        self.fg.pack(side=Tix.LEFT, padx=0, pady=0, fill=Tix.BOTH, expand=1)
+        self.common.pack(side=Tix.RIGHT, padx=0, fill=Tix.Y)
+        self.graph = SimpleGraph(self.fg).draw()
         
         
         #Tab for about
@@ -259,9 +268,7 @@ class piGUI:
         fp = open('pi', 'r')
         data = fp.readlines()
         fp.close()
-	#print data
         p = TextFormatter(data[0]).format()
-	#print p
         self.lb_text.insert(1.0, ''.join(p))
         
     def find_event(self, event=None):
