@@ -6,13 +6,19 @@ MiNI 2008 Politehcnika Warsaw
 """
 from Tkinter import *
 import Tix
+import re
 
 try:
-    from Image import *
+    import Image
     PIL = 1
 except ImportError:
     PIL = 0
     print "Application required PIL Imaging module to plot graph"
+
+
+def alert(val):
+    import Dialog
+    Dialog.Dialog(title="Picake", text=val, bitmap="",default=0,strings=("OK",))
 
 class SimpleGraph:
     """ Creates Graph GUI """
@@ -38,4 +44,28 @@ class SimpleGraph:
         self.butBox.pack(side=Tix.BOTTOM, fill=Tix.X)
         
     def search_plot(self):
-        pass
+        stat = list()
+        try:
+            fr = int(self.ma1.get())
+            to = int(self.ma2.get())
+            if fr < 1 or to <= 1:
+                raise ValueError
+            if fr > to:
+                alert('Please provide an increasing range')
+                return
+        except ValueError:
+                alert('Please provide positive integer values')
+                return
+        try:
+            fp = open('pi', 'r')
+        except IOError:
+            alert('Error Reading pi dump file')
+            return
+        T = fp.read()
+        fp.close()
+        for i in xrange(fr, to):
+            stat.append([match.start() for match in re.finditer(str(i), T)])
+        print stat
+
+        
+            

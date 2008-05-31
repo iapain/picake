@@ -36,7 +36,6 @@ class pi:
 
 	def gmp_arch_tan(self):
 		self.method = "ArcTan"
-		print self.method
 		ts = time.time()
 		dat =  str(gmpy.pi(self.percision*3 + int(self.percision/10) + int(4*self.percision/100) + int(5*self.percision/10)))[:self.percision]
 		self.time_took = time.time() - ts
@@ -46,6 +45,7 @@ class pi:
 			print "Computation uses file IO. Couldn't create file for dumping values."
 		fp.write(dat)
 		fp.close()
+		print self.time_took
 		return;
 		
 	def compute_chudnovsky(self):

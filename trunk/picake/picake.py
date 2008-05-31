@@ -5,6 +5,7 @@ MiNI 2008 Politehcnika Warsaw
 """
 import re
 from Tkinter import *
+from tkFileDialog import askopenfilename, asksaveasfilename
 import Tix
 import signal
 from pi import pi
@@ -22,6 +23,7 @@ APP_MENTOR_HOME = "http://www.mini.pw.edu.pl/~homenda/"
 APP_YEAR = "2008"
 APP_DEPT = "MiNI, Politechnika Warsaw"
 APP_AUTHOR_HOME = "http://gamma.mini.pw.edu.pl/~thukrald/"
+APP_LICESNE = "GNU General Public License v2"
 
 class sigHandler:
 	""" Adds posibility to stop program while computation """
@@ -37,21 +39,21 @@ def vp_start_gui():
     root = Tix.Tk()
     menubar = Menu(root)
     filemenu = Menu(menubar, tearoff=0)
-    filemenu.add_command(label="Open", command=None)
-    filemenu.add_command(label="Save", command=None)
+    filemenu.add_command(label="Open", underline=0, command=picake_open)
+    filemenu.add_command(label="Save", underline=0, command=picake_save)
     filemenu.add_separator()
-    filemenu.add_command(label="Exit", command=root.quit)
-    menubar.add_cascade(label="File", menu=filemenu)
+    filemenu.add_command(label="Exit", underline=0, command=root.quit)
+    menubar.add_cascade(label="File", underline=0, menu=filemenu)
     
     # create more pulldown menus
     editmenu = Menu(menubar, tearoff=0)
-    editmenu.add_command(label="Cut", command=None)
-    editmenu.add_command(label="Copy", command=None)
-    editmenu.add_command(label="Paste", command=None)
+    editmenu.add_command(label="Cut (Ctrl+x)", command=picake_cut)
+    editmenu.add_command(label="Copy (Ctrl+c)", command=picake_copy)
+    editmenu.add_command(label="Paste (Ctrl+v)", command=picake_paste)
     menubar.add_cascade(label="Edit", menu=editmenu)
     
     helpmenu = Menu(menubar, tearoff=0)
-    helpmenu.add_command(label="About", command=None)
+    helpmenu.add_command(label="About", command=picake_about)
     menubar.add_cascade(label="Help", menu=helpmenu)
     
     # display the menu
@@ -189,7 +191,7 @@ class piGUI:
         Label(self.f, text=APP_NAME, font=('courier',16,'bold')).pack(fill=Tix.X, padx=3, pady=3)
         Label(self.f, text="Author: %s\n%s" %(APP_AUTHOR, APP_AUTHOR_HOME), font=('courier',12,'bold')).pack(fill=Tix.X, padx=3, pady=3)
         Label(self.f, text="Under guidance of %s\n%s" %(APP_MENTOR, APP_MENTOR_HOME), font=('courier',12,'bold')).pack(fill=Tix.X, padx=3, pady=3)
-        Label(self.f, text="%s\n%s\n%s" %(APP_DESC, APP_DEPT, APP_YEAR)).pack(fill=Tix.X, padx=3, pady=3)
+        Label(self.f, text="%s\n%s\n%s\n%s" %(APP_DESC, APP_DEPT, APP_LICESNE, APP_YEAR)).pack(fill=Tix.X, padx=3, pady=3)
             
     def run(self):
         try:
@@ -274,6 +276,61 @@ class piGUI:
     def find_event(self, event=None):
         SearchDialog.find(self.lb_text)
         return "break"
+
+
+def picake_open():
+    f = askopenfilename()
+    try:
+        fp = open(f, 'r')
+    except IOError:
+        alert('Error reading file')
+        return
+    data = fp.read()
+    fp.close()
+    w.lb_text.delete(1.0, END)
+    w.lb_text.insert(1.0, data)
+    return
+    
+
+def picake_save():
+    f = asksaveasfilename()
+    data = w.lb_text.get(1.0, END)
+    try:
+        fp = open(f, 'w')
+    except IOError:
+        alert('Error writing file')
+        return
+    
+    fp.write(data)
+    fp.close()
+    return
+
+def picake_cut():
+    try:
+        selection = w.lb_text.get(SEL_FIRST, SEL_LAST)
+        w.lb_text.clipboard_clear()
+        w.lb_text.clipboard_append(selection)
+        w.lb_text.delete(SEL_FIRST, SEL_LAST)
+    except:
+        pass
+
+def picake_paste():
+    try:
+        topaste = w.lb_text.selection_get(selection="CLIPBOARD")
+        w.lb_text.insert(INSERT, topaste)
+    except:
+        pass
+
+def picake_copy():
+    try:
+        selection = w.lb_text.get(SEL_FIRST, SEL_LAST)
+        w.lb_text.clipboard_clear()
+        w.lb_text.clipboard_append(selection)
+    except:
+        pass
+
+def picake_about():
+    alert('%s - %s\n Written by %s\n Under supervision of %s' % (APP_NAME, APP_DESC, APP_AUTHOR, APP_MENTOR))
 
 def alert(val):
     import Dialog
