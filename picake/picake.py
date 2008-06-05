@@ -25,12 +25,13 @@ APP_DEPT = "MiNI, Politechnika Warsaw"
 APP_AUTHOR_HOME = "http://gamma.mini.pw.edu.pl/~thukrald/"
 APP_LICESNE = "GNU General Public License v2"
 
-class sigHandler:
-	""" Adds posibility to stop program while computation """
-	def __init__(self):
-		self.signaled = 0
-	def __call__(self):
-		self.signaled += 1
+class SigHandler:
+        def __init__(self):
+            self.signaled = 0
+            self.sn=None
+        def __call__(self, sn, sf):
+            self.sn = sn 
+            self.signaled += 1
 
 
 def vp_start_gui():
@@ -194,11 +195,24 @@ class piGUI:
         Label(self.f, text="%s\n%s\n%s\n%s" %(APP_DESC, APP_DEPT, APP_LICESNE, APP_YEAR)).pack(fill=Tix.X, padx=3, pady=3)
             
     def run(self):
+        v = self.ma.get().strip()
+        unit = v[len(v)-1]
         try:
-            n = int(self.ma.get())
+            n = int(v[:len(v)-1])
         except (TypeError, ValueError):
             alert('Percision should be an Integer')
             return
+        try:
+            uni = int(unit)
+            n = n*10 + uni
+        except:
+            if unit == 'm' or unit == 'M':
+                n*=1000000
+            elif unit == 'k' or unit == 'K':
+                n*=1000
+            else:
+                alert('Percision should be an Integer with unit K or M for thousand and million')
+                return
         pii = pi(n)
         try:
             if n > 10000:
