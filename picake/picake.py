@@ -196,6 +196,9 @@ class piGUI:
             
     def run(self):
         v = self.ma.get().strip()
+        if v == '':
+            alert('Percision should be an Integer')
+            return
         unit = v[len(v)-1]
         try:
             n = int(v[:len(v)-1])
@@ -215,13 +218,15 @@ class piGUI:
                 return
         pii = pi(n)
         try:
-            if n > 10000:
-                r = pii.gmp_arch_tan()
+            if n >= 10000:
+                r = pii.fast_cal()
             else:
-                r = pii.compute_chudnovsky()
+                r = pii.gmp_arch_tan()
+
         finally:
             self.refresh_text(self.lb_text)
-            self.refresh_text(self.lbs_text) 
+            self.refresh_text(self.lbs_text)
+            self.format_text()
             
     def run_search(self):
         global ql
