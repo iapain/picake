@@ -55,8 +55,8 @@ class TextFormatter:
                     else:
                         self.format_text.append('\n') 
                 r = 0
-                    
-        return self.format_text
+        self.format_text.append(buff)   
+        return self.format_text 
 
 """
 a = TextFormatter('122323123123712387821763781263876218736126531213211111131712532135875875765765765765765765765765765765555555555555555555555555555567666666666666')

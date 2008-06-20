@@ -29,10 +29,37 @@ class pi:
 	""" compute pi computes value of pi based on various alrogithms """
 	def __init__(self, percision=100, time=-1, n=2):
 		self.percision = percision
-		self.n = n
+		self.n = n+60
 		self.time = time
 		self.time_took = -1
 		self.convergence = -1
+		
+	def fast_cal(self):
+		from popen2 import popen2
+		cmd = 'lib32\\lib.pyd %d pi -fancy:100,100,0,0,none' % self.percision
+		output, input = popen2(cmd)
+		ans = output.readlines()
+		try:
+			fp = open('pi', 'r')
+		except IOError:
+			print "Computation uses file IO. Couldn't create file for dumping values."
+			return
+		op = fp.readlines()[23:]
+		
+		fp.close()
+		try:
+			fp = open('pi', 'w')
+		except IOError:
+			print "Computation uses file IO. Couldn't create file for dumping values."
+			return
+		obb = '3.'
+		for line in op:
+			obb += line.replace('\n', '')
+		fp.write(obb)
+		fp.close()
+		
+		
+		
 
 	def gmp_arch_tan(self):
 		self.method = "ArcTan"

@@ -73,6 +73,13 @@ class SimpleCalculator:
 
         self.entry.focus_set()
         
+        
+    def autocast(self, n):
+        loc = n.find(".")
+        if loc >= 0:
+            return gmpy.mpf(n)
+        return gmpy.mpz(n)
+        
     def load_file1(self):
         self.load_file(1)
         
@@ -171,8 +178,9 @@ class SimpleCalculator:
         if key == '*':
             self.answer.delete(0, END)
             try:
-                self.answer.insert(0, str(gmpy.mpf(self.entry.get())*gmpy.mpf(self.entry2.get())))
-            except:
+                self.answer.insert(0, str(self.autocast(self.entry.get())*self.autocast(self.entry2.get())))
+            except Exception, e:
+                print str(e)
                 self.answer.insert(0, 'Error')
 
         if key == '/':
@@ -185,14 +193,14 @@ class SimpleCalculator:
         if key == '+':
             self.answer.delete(0, END)
             try:
-                self.answer.insert(0, str(gmpy.mpf(self.entry.get())+gmpy.mpf(self.entry2.get())))
+                self.answer.insert(0, str(self.autocast(self.entry.get())+self.autocast(self.entry2.get())))
             except:
                 self.answer.insert(0, 'Error')
 
         if key == '-':
             self.answer.delete(0, END)
             try:
-                self.answer.insert(0, str(gmpy.mpf(self.entry.get())-gmpy.mpf(self.entry2.get())))
+                self.answer.insert(0, str(self.autocast(self.entry.get())-self.autocast(self.entry2.get())))
             except:
                 self.answer.insert(0, 'Error')
 
