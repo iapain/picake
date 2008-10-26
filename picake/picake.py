@@ -140,7 +140,7 @@ class piGUI:
         self.p2 = self.spane.add('b', min=70)
 
         self.spane.pack(fill=BOTH, expand=1)
-        self.lbs = Tix.ScrolledText(self.p1, scrollbar='auto')
+        self.lbs = Tix.ScrolledText(self.p1, width=80)
         self.lbs_text = self.lbs.subwidget_list["text"]
         self.lbs.text['wrap'] = None
         self.lbs.pack(fill=BOTH, expand=1)
@@ -148,7 +148,7 @@ class piGUI:
         self.lbs_text.bind('<Control-f>', self.find_event)
         self.lbs_text.bind('<Control-F>', self.find_event)
         
-        self.refresh_text(self.lbs_text)
+        self.refresh_text(self.lbs_text, True)
         
         self.spane2 = Tix.PanedWindow(self.p2, orientation='vertical')
 
@@ -220,12 +220,13 @@ class piGUI:
         try:
             if n >= 10000:
                 r = pii.fast_cal()
-            else:
+            elif n>= 1000:
                 r = pii.gmp_arch_tan()
-
+            else:
+                r = pii.compute_chudnovsky()
         finally:
             self.refresh_text(self.lb_text)
-            self.refresh_text(self.lbs_text)
+            self.refresh_text(self.lbs_text, True)
             self.format_text()
             
     def run_search(self):
@@ -267,7 +268,7 @@ class piGUI:
 
             
         
-    def refresh_text(self, a):
+    def refresh_text(self, a, nf=False):
         try:
             #self.lb.text['state'] = 'enabled'
             a.delete(1.0, END)
@@ -275,7 +276,11 @@ class piGUI:
             data = fp.read()
             #p = TextFormatter(data[2:]).format()
             #print data
-            a.insert(1.0, data)
+            if not nf:
+                p = TextFormatter(data).format()
+                a.insert(1.0, ''.join(p))
+            else:
+                a.insert(1.0, data)
             #self.lb.text['state'] = 'disabled'
             fp.close()
             #alert(len(data)-2)
@@ -307,13 +312,14 @@ def picake_open():
     data = fp.read()
     fp.close()
     w.lb_text.delete(1.0, END)
-    w.lb_text.insert(1.0, data)
+    p = TextFormatter(str(data)).format()
+    w.lb_text.insert(1.0, ''.join(p))
     return
     
 
 def picake_save():
     f = asksaveasfilename()
-    data = w.lb_text.get(1.0, END)
+    data = open("pi", 'r').read()
     try:
         fp = open(f, 'w')
     except IOError:
